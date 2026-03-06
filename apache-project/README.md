@@ -93,6 +93,7 @@ Import dashboard:
 
 - `docs/04-two-machine-deployment.md`
 - `docs/grafana-dashboard.md`
+- `docs/README.md`
 
 ## Stop Machine A stack
 

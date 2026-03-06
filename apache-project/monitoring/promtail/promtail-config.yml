@@ -16,12 +16,6 @@ scrape_configs:
           job: apache_access
           app: apache-project
           __path__: /var/log/apache2/access.log
-    pipeline_stages:
-      - regex:
-          expression: '^(?P<ip>\\S+) (?P<ident>\\S+) (?P<user>\\S+) \\[(?P<ts>[^\\]]+)\\] "(?P<method>\\S+) (?P<path>\\S+) (?P<proto>[^"]+)" (?P<status>\\d{3}) (?P<bytes>\\S+) (?P<duration>\\d+) "(?P<referrer>[^"]*)" "(?P<agent>[^"]*)"$'
-      - labels:
-          method:
-          status:
 
   - job_name: apache_error
     static_configs:
@@ -30,8 +24,3 @@ scrape_configs:
           job: apache_error
           app: apache-project
           __path__: /var/log/apache2/error.log
-    pipeline_stages:
-      - regex:
-          expression: '^\\[[^\\]]+\\] \\[(?P<level>[^\\]]+)\\] .*'
-      - labels:
-          level:
