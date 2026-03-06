@@ -1,0 +1,11 @@
+# Paste this into /etc/prometheus/prometheus.yml on the Prometheus server.
+# Then restart Prometheus service.
+
+- job_name: apache_remote
+  scrape_interval: 5s
+  static_configs:
+    - targets:
+        - <APACHE_LOKI_HOST>:9117
+      labels:
+        site: apache-loki-remote
+        service: apache

@@ -1,0 +1,153 @@
+{
+  "id": null,
+  "uid": "apache-project-observability",
+  "title": "Apache Project - Metrics and Logs",
+  "tags": ["apache", "prometheus", "loki"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Apache Up",
+      "id": 1,
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "max(up{job=\"apache\"})",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ] }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Busy Workers",
+      "id": 2,
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "max(apache_workers{state=\"busy\"})", "refId": "A" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Idle Workers",
+      "id": 3,
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "max(apache_workers{state=\"idle\"})", "refId": "A" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "CPU Load",
+      "id": 4,
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "max(apache_cpu_load)", "refId": "A" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Requests/sec",
+      "id": 5,
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "sum(rate(apache_accesses_total[1m]))", "refId": "A" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Traffic (KB/sec)",
+      "id": 6,
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "sum(rate(apache_sent_kilobytes_total[1m]))", "refId": "A" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Total Accesses",
+      "id": 7,
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "apache_accesses_total", "refId": "A" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "p95 Request Duration from Access Logs (ms)",
+      "id": 8,
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "expr": "quantile_over_time(0.95, {job=\"apache_access\"} | pattern \"<ip> <ident> <user> [<ts>] \\\"<method> <path> <proto>\\\" <status> <bytes> <duration> \\\"<referrer>\\\" \\\"<agent>\\\"\" | unwrap duration [5m]) / 1000",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Status Code Rate by Status",
+      "id": 9,
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "expr": "sum by (status) (rate({job=\"apache_access\"} | pattern \"<ip> <ident> <user> [<ts>] \\\"<method> <path> <proto>\\\" <status> <bytes> <duration> \\\"<referrer>\\\" \\\"<agent>\\\"\" [1m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Error Log Volume by Level",
+      "id": 10,
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 20 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "expr": "sum by (level) (count_over_time({job=\"apache_error\"} | regexp \\\"\\\\] \\\\[(?P<level>[^\\\\]]+)\\\\]\\\" [5m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "logs",
+      "title": "Recent Error/Warn Logs",
+      "id": 11,
+      "gridPos": { "h": 8, "w": 16, "x": 8, "y": 20 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "expr": "{job=\"apache_error\"} |~ \"(?i)warn|error\"",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

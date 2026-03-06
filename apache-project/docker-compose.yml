@@ -1,0 +1,71 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: ./app
+    container_name: apache-web
+    ports:
+      - "8088:80"
+    volumes:
+      - apache_logs:/var/log/apache2
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://localhost/health.php')===false?1:0);"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  apache-exporter:
+    image: quay.io/prometheuscommunity/apache-exporter:v1.0.8
+    container_name: apache-exporter
+    command:
+      - "--scrape_uri=http://web/server-status?auto"
+      - "--telemetry.endpoint=/metrics"
+    ports:
+      - "9117:9117"
+    depends_on:
+      - web
+    restart: unless-stopped
+
+  loki:
+    image: grafana/loki:2.9.8
+    container_name: loki
+    ports:
+      - "3100:3100"
+    command: ["-config.file=/etc/loki/local-config.yaml"]
+    volumes:
+      - ./monitoring/loki/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    restart: unless-stopped
+
+  promtail:
+    image: grafana/promtail:2.9.8
+    container_name: promtail
+    command: ["-config.file=/etc/promtail/config.yml"]
+    volumes:
+      - ./monitoring/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - apache_logs:/var/log/apache2:ro
+    depends_on:
+      - loki
+      - web
+    restart: unless-stopped
+
+  loadgen:
+    build:
+      context: ./loadgen
+    container_name: apache-loadgen
+    environment:
+      - TARGET_BASE_URL=http://web
+      - MIN_RPS=4
+      - MAX_RPS=42
+      - WINDOW_SECONDS=7
+      - WORKERS=30
+      - REQ_TIMEOUT_SECONDS=6
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  apache_logs:
+  loki_data:

@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: apache_remote
+    static_configs:
+      # Replace with the Apache/Loki host IP or DNS reachable from Prometheus machine.
+      - targets: ["<APACHE_LOKI_HOST>:9117"]
