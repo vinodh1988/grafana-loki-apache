@@ -132,12 +132,12 @@ If Docker packages fail to resolve:
 If Apache exporter image fails with `failed to resolve reference`:
 
 ```bash
-docker pull ghcr.io/prometheuscommunity/apache-exporter:latest
+docker pull bitnami/apache-exporter:latest
 docker compose pull apache-exporter
 docker compose up -d apache-exporter
 ```
 
-If your server blocks `ghcr.io`, use a registry mirror in `/etc/docker/daemon.json` and restart Docker:
+If your server cannot reach Docker Hub, use a registry mirror in `/etc/docker/daemon.json` and restart Docker:
 
 ```json
 {

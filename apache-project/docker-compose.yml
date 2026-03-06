@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
 
   apache-exporter:
-    image: ghcr.io/prometheuscommunity/apache-exporter:latest
+    image: bitnami/apache-exporter:latest
     container_name: apache-exporter
     command:
       - "--scrape_uri=http://web/server-status?auto"
