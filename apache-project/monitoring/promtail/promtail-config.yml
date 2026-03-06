@@ -15,7 +15,7 @@ scrape_configs:
         labels:
           job: apache_access
           app: apache-project
-          __path__: /var/log/apache2/access.log
+          __path__: /var/log/apache-real/access.log
 
   - job_name: apache_error
     static_configs:
@@ -23,4 +23,4 @@ scrape_configs:
         labels:
           job: apache_error
           app: apache-project
-          __path__: /var/log/apache2/error.log
+          __path__: /var/log/apache-real/error.log

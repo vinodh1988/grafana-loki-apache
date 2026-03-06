@@ -8,7 +8,7 @@ services:
     ports:
       - "8088:80"
     volumes:
-      - apache_logs:/var/log/apache2
+      - apache_logs:/var/log/apache-real
     healthcheck:
       test: ["CMD", "php", "-r", "exit(@file_get_contents('http://localhost/health.php')===false?1:0);"]
       interval: 10s
@@ -45,7 +45,7 @@ services:
     command: ["-config.file=/etc/promtail/config.yml"]
     volumes:
       - ./monitoring/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
-      - apache_logs:/var/log/apache2:ro
+      - apache_logs:/var/log/apache-real:ro
     depends_on:
       - loki
       - web
