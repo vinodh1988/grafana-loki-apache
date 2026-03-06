@@ -1,0 +1,35 @@
+# Merge into your Alertmanager config (commonly /etc/alertmanager/alertmanager.yml)
+# and restart Alertmanager.
+
+global:
+  resolve_timeout: 1m
+
+route:
+  receiver: webhook-default
+  group_by: [alertname, severity]
+  group_wait: 10s
+  group_interval: 20s
+  repeat_interval: 2m
+  routes:
+    - receiver: webhook-warning
+      matchers:
+        - severity="warning"
+    - receiver: webhook-critical
+      matchers:
+        - severity="critical"
+
+receivers:
+  - name: webhook-default
+    webhook_configs:
+      - url: http://<WEBHOOK_HOST>:5001/alertmanager
+        send_resolved: true
+
+  - name: webhook-warning
+    webhook_configs:
+      - url: http://<WEBHOOK_HOST>:5001/alertmanager
+        send_resolved: true
+
+  - name: webhook-critical
+    webhook_configs:
+      - url: http://<WEBHOOK_HOST>:5001/alertmanager
+        send_resolved: true

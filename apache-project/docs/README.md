@@ -118,5 +118,6 @@ Expected panel behavior:
 ## Related docs
 
 - `docs/04-two-machine-deployment.md`
+- `docs/how-to-check-working.md`
 - `grafana-dashboard.md`
 - `README.md`

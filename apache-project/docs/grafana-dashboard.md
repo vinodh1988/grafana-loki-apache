@@ -2,6 +2,56 @@
 
 This document is for your setup where Grafana runs as a Linux service on a different machine than Apache/Loki.
 
+## Connect Loki To Grafana (Step-by-step)
+
+Use these exact steps on Machine B (Grafana host).
+
+1. Confirm Loki is reachable from Machine B:
+
+```bash
+curl -s http://<APACHE_LOKI_HOST>:3100/ready
+```
+
+Expected output:
+- `ready`
+
+2. In Grafana UI, go to `Connections -> Data sources -> Add data source`.
+3. Select `Loki`.
+4. Set fields:
+  - Name: `Loki`
+  - URL: `http://<APACHE_LOKI_HOST>:3100`
+  - Access: `Server (default)`
+  - UID: `loki`
+5. Click `Save & test`.
+
+Expected output:
+- Data source is working.
+
+6. Validate log flow in Grafana Explore using datasource `Loki`.
+
+Run queries:
+
+```logql
+{job="apache_access"}
+```
+
+```logql
+{job="apache_error"}
+```
+
+Expected output:
+- Live log lines are visible for both queries.
+
+7. Validate dashboard binding.
+
+Open dashboard `Apache Project - Metrics and Logs` and confirm Loki panels return data.
+
+If Loki datasource test fails:
+- Check firewall from Machine B to `<APACHE_LOKI_HOST>:3100`.
+- Check `docker compose logs --tail=100 loki` on Machine A.
+- Check `docker compose logs --tail=100 promtail` on Machine A.
+- Confirm time range in Grafana is at least `Last 30 minutes`.
+
 ## Files in this project
 
 - Dashboard JSON:

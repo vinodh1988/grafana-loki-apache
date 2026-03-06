@@ -1,0 +1,19 @@
+# Merge this into your Linux Prometheus config (commonly /etc/prometheus/prometheus.yml)
+# and restart Prometheus.
+
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+scrape_configs:
+  - job_name: grafana_alerts_exporter
+    scrape_interval: 5s
+    static_configs:
+      - targets:
+          - <EXPORTER_HOST>:9108
+        labels:
+          app: grafana-alerts
+          env: demo

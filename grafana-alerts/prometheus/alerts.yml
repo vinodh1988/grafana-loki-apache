@@ -1,0 +1,23 @@
+groups:
+  - name: custom-signal-alerts
+    interval: 5s
+    rules:
+      - alert: SignalAboveDynamicThresholdWarning
+        expr: custom_signal_value > custom_threshold_value
+        for: 15s
+        labels:
+          severity: warning
+          source: custom-exporter
+        annotations:
+          summary: "Signal above dynamic threshold (warning)"
+          description: "Signal value is above threshold for 15s."
+
+      - alert: SignalAboveDynamicThresholdCritical
+        expr: custom_signal_value > (custom_threshold_value * 1.5)
+        for: 30s
+        labels:
+          severity: critical
+          source: custom-exporter
+        annotations:
+          summary: "Signal above dynamic threshold (critical)"
+          description: "Signal value is more than 1.5x threshold for 30s."
